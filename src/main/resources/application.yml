@@ -9,5 +9,8 @@ spring:
       lifecycle-management: start_only
 
 jms:
+  clientId: myClientId
   queueName: demo.queue
   topicName: demo.topic
+  durable:
+    subscription: mySubscription

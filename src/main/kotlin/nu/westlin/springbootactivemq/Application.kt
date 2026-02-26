@@ -29,10 +29,10 @@ fun main(args: Array<String>) {
 class JmsConfig {
 
     @Bean
-    fun connectionFactory(): CachingConnectionFactory {
+    fun connectionFactory(@Value($$"${jms.clientId}") jmsClientId: String): CachingConnectionFactory {
         val activeMqConnectionFactory = ActiveMQConnectionFactory("tcp://localhost:61616")
         val cachingConnectionFactory = CachingConnectionFactory(activeMqConnectionFactory)
-        cachingConnectionFactory.setClientId("myClientId")
+        cachingConnectionFactory.setClientId(jmsClientId)
         return cachingConnectionFactory
     }
 
@@ -107,7 +107,7 @@ class MessageListeners {
     @JmsListener(
         destination = $$"${jms.topicName}",
         containerFactory = "durableTopicListenerFactory",
-        subscription = "mySubscription"
+        subscription = $$"${jms.durable.subscription}"
     )
     fun onMessage(message: String) {
         println("Durable Topic received: $message")

@@ -29,8 +29,13 @@ fun main(args: Array<String>) {
 class JmsConfig {
 
     @Bean
-    fun connectionFactory(@Value($$"${jms.clientId}") jmsClientId: String): CachingConnectionFactory {
-        val activeMqConnectionFactory = ActiveMQConnectionFactory("tcp://localhost:61616")
+    fun connectionFactory(
+        @Value($$"${jms.clientId}") jmsClientId: String,
+        @Value($$"${jms.broker.url}") brokerUrl: String,
+        @Value($$"${jms.broker.user}") brokerUser: String,
+        @Value($$"${jms.broker.password}") brokerPassword: String
+    ): CachingConnectionFactory {
+        val activeMqConnectionFactory = ActiveMQConnectionFactory(brokerUser, brokerPassword, brokerUrl)
         val cachingConnectionFactory = CachingConnectionFactory(activeMqConnectionFactory)
         cachingConnectionFactory.setClientId(jmsClientId)
         return cachingConnectionFactory

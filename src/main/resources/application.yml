@@ -1,14 +1,14 @@
 spring:
   application.name: SpringBootActiveMQ
-  activemq:
-    broker-url: tcp://localhost:61616
-    user: admin
-    password: admin
   docker:
     compose:
       lifecycle-management: start_only
 
 jms:
+  broker:
+    url: tcp://localhost:61616
+    user: admin     # user och password används egentligen inte eftersom säkerhet är avslaget i Dockerimagen för ActiveMQ
+    password: admin
   clientId: myClientId
   queueName: demo.queue
   topicName: demo.topic

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory
 import org.springframework.jms.config.JmsListenerContainerFactory
-import org.springframework.jms.connection.CachingConnectionFactory
+import org.springframework.jms.connection.SingleConnectionFactory
 import org.springframework.jms.core.JmsTemplate
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
@@ -28,6 +28,8 @@ fun main(args: Array<String>) {
 @Configuration
 class JmsConfig {
 
+    // CachingConnectionFactory Funkar inte i native för den använder reflection
+    /*
     @Bean
     fun connectionFactory(
         @Value($$"${jms.clientId}") jmsClientId: String,
@@ -40,6 +42,20 @@ class JmsConfig {
         cachingConnectionFactory.setClientId(jmsClientId)
         return cachingConnectionFactory
     }
+*/
+
+    @Bean
+    fun connectionFactory(
+        @Value("\${jms.clientId}") jmsClientId: String,
+        @Value("\${jms.broker.url}") brokerUrl: String,
+        @Value("\${jms.broker.user}") brokerUser: String,
+        @Value("\${jms.broker.password}") brokerPassword: String
+    ): SingleConnectionFactory {
+        val activeMqConnectionFactory = ActiveMQConnectionFactory(brokerUser, brokerPassword, brokerUrl)
+        val singleConnectionFactory = SingleConnectionFactory(activeMqConnectionFactory)
+        singleConnectionFactory.setClientId(jmsClientId)
+        return singleConnectionFactory
+    }
 
     @Bean
     fun nonDurableTopicListenerFactory(connectionFactory: ConnectionFactory): JmsListenerContainerFactory<*> {
@@ -50,7 +66,7 @@ class JmsConfig {
     }
 
     @Bean
-    fun durableTopicListenerFactory(connectionFactory: ConnectionFactory) : JmsListenerContainerFactory<*> {
+    fun durableTopicListenerFactory(connectionFactory: ConnectionFactory): JmsListenerContainerFactory<*> {
         return DefaultJmsListenerContainerFactory().apply {
             setConnectionFactory(connectionFactory)
             setPubSubDomain(true)

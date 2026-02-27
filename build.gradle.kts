@@ -3,19 +3,12 @@ plugins {
     kotlin("plugin.spring") version "2.3.10"
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.graalvm.buildtools.native") version "0.11.4"
 }
 
 group = "nu.westlin"
 version = "0.0.1-SNAPSHOT"
 description = "SpringBootActiveMQ"
-
-/*
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-}
-*/
 
 repositories {
     mavenCentral()
@@ -46,3 +39,12 @@ kotlin {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+/*
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootBuildImage>("bootBuildImage") {
+    imageName.set("springboot-activemq:latest")
+}*/

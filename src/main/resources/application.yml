@@ -1,3 +1,4 @@
+#file: noinspection SpringBootApplicationYaml
 spring:
   application.name: SpringBootActiveMQ
   docker:
@@ -7,8 +8,8 @@ spring:
 jms:
   broker:
     url: tcp://localhost:61616
-    user: admin     # user och password används egentligen inte eftersom säkerhet är avslaget i Dockerimagen för ActiveMQ
-    password: admin
+    user: user
+    password: password
   clientId: myClientId
   queueName: demo.queue
   topicName: demo.topic

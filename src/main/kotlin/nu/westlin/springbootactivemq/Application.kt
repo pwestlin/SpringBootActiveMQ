@@ -2,6 +2,8 @@ package nu.westlin.springbootactivemq
 
 import jakarta.jms.ConnectionFactory
 import org.apache.activemq.ActiveMQConnectionFactory
+import org.apache.activemq.command.ActiveMQQueue
+import org.apache.activemq.command.ActiveMQTopic
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -11,7 +13,7 @@ import org.springframework.jms.annotation.JmsListener
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory
 import org.springframework.jms.config.JmsListenerContainerFactory
 import org.springframework.jms.connection.CachingConnectionFactory
-import org.springframework.jms.core.JmsTemplate
+import org.springframework.jms.core.JmsClient
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.PostMapping
@@ -50,7 +52,7 @@ class JmsConfig {
     }
 
     @Bean
-    fun durableTopicListenerFactory(connectionFactory: ConnectionFactory) : JmsListenerContainerFactory<*> {
+    fun durableTopicListenerFactory(connectionFactory: ConnectionFactory): JmsListenerContainerFactory<*> {
         return DefaultJmsListenerContainerFactory().apply {
             setConnectionFactory(connectionFactory)
             setPubSubDomain(true)
@@ -59,30 +61,28 @@ class JmsConfig {
     }
 
     @Bean
-    fun queueJmsTemplate(connectionFactory: ConnectionFactory): JmsTemplate {
-        return JmsTemplate(connectionFactory)
-    }
-
-    @Bean
-    fun topicJmsTemplate(connectionFactory: ConnectionFactory): JmsTemplate = JmsTemplate(connectionFactory).apply {
-        isPubSubDomain = true
-    }
+    fun jmsClient(connectionFactory: ConnectionFactory): JmsClient =
+        JmsClient.builder(connectionFactory)
+            .build()
 }
 
 @Service
 class MessagingService(
-    private val queueJmsTemplate: JmsTemplate, // default, queue
-    private val topicJmsTemplate: JmsTemplate,  // separat, topic
+    private val jmsClient: JmsClient,
     @Value($$"${jms.queueName}") private val queueName: String,
     @Value($$"${jms.topicName}") private val topicName: String,
 ) {
 
     fun sendToQueue(message: String) {
-        queueJmsTemplate.convertAndSend(queueName, message)
+        jmsClient
+            .destination(ActiveMQQueue(queueName))
+            .send(message)
     }
 
     fun sendToTopic(message: String) {
-        topicJmsTemplate.convertAndSend(topicName, message)
+        jmsClient
+            .destination(ActiveMQTopic(topicName))
+            .send(message)
     }
 }
 

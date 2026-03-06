@@ -1,5 +1,6 @@
 ### HelloTopic
 POST http://localhost:8080/send/topic?message=HelloTopic
 
+
 ### HelloQueue
-POST http://localhost:8080/send/topic?message=HelloQueue
+POST http://localhost:8080/send/queue?message=HelloQueue

@@ -64,24 +64,34 @@ class JmsConfig {
     fun jmsClient(connectionFactory: ConnectionFactory): JmsClient =
         JmsClient.builder(connectionFactory)
             .build()
+
+    @Bean
+    fun activeMQQueue(
+        @Value($$"${jms.queueName}") queueName: String,
+    ): ActiveMQQueue = ActiveMQQueue(queueName)
+
+    @Bean
+    fun activeMQTopic(
+        @Value($$"${jms.topicName}") topicName: String,
+    ): ActiveMQTopic = ActiveMQTopic(topicName)
 }
 
 @Service
 class MessagingService(
     private val jmsClient: JmsClient,
-    @Value($$"${jms.queueName}") private val queueName: String,
-    @Value($$"${jms.topicName}") private val topicName: String,
+    private val queue: ActiveMQQueue,
+    private val topic: ActiveMQTopic,
 ) {
 
     fun sendToQueue(message: String) {
         jmsClient
-            .destination(ActiveMQQueue(queueName))
+            .destination(queue)
             .send(message)
     }
 
     fun sendToTopic(message: String) {
         jmsClient
-            .destination(ActiveMQTopic(topicName))
+            .destination(topic)
             .send(message)
     }
 }

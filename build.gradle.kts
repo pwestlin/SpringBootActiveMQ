@@ -9,14 +9,6 @@ group = "nu.westlin"
 version = "0.0.1-SNAPSHOT"
 description = "SpringBootActiveMQ"
 
-/*
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-}
-*/
-
 repositories {
     mavenCentral()
 }
